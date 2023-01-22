@@ -1,0 +1,32 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - type: volume
+        source: mongodbvolume
+        target: /data/db
+
+  server:
+    build: server
+    ports:
+      - "8080:8080"
+    links:
+      - mongodb
+    env_file:
+      - server/.env
+
+  worker:
+    build: worker
+    links:
+      - mongodb
+    env_file:
+      - worker/.env
+    command:
+      - ./worker
+      - music # Search term to gather videos for
+
+volumes:
+  mongodbvolume:
